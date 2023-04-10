@@ -1,0 +1,8 @@
+render.mp4
+render_small.mp4
+
+build/
+pics/
+
+julia
+Makefile
