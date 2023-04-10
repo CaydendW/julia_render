@@ -1,5 +1,5 @@
 # Julia render
-Simple little julia render that I used to create a very lovely animation. To see the results of that, see .
+Simple little julia render that I used to create a very lovely animation. To see the results of that, see https://youtu.be/6tMu-61DL7I.
 
 # Usage
 1. Edit src/main.c and change the constants as desired. **N.B: CHANGE THE `THREADS` VALUE TO THE AMMOUNT OF CORES YOU HAVE OR SUFFER**. Modify how the colours array is filled in for nicer colours.
