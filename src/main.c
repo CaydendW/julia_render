@@ -40,9 +40,9 @@
 
 #define COLOUR_DEPTH (size_t)30000
 
-#define ITTERATIONS 2500
+#define ITERATIONS 2500
 
-#define ROTATE_AMMOUNT 0.01
+#define ROTATE_AMOUNT 0.01
 
 #else
 
@@ -51,9 +51,9 @@
 
 #define COLOUR_DEPTH (size_t)65536
 
-#define ITTERATIONS (8192 * 2)
+#define ITERATIONS (8192 * 2)
 
-#define ROTATE_AMMOUNT 0.0004363323129985824
+#define ROTATE_AMOUNT 0.0004363323129985824
 
 #endif
 
@@ -86,7 +86,7 @@ static void *render(void *_inf) {
 
       size_t k = 0;
 
-      while (k < ITTERATIONS && zx * zx + zy * zy <= THRESHOLD) {
+      while (k < ITERATIONS && zx * zx + zy * zy <= THRESHOLD) {
         long double nx = zx * zx - zy * zy + real;
         long double ny = 2 * zx * zy + imag;
 
@@ -96,13 +96,13 @@ static void *render(void *_inf) {
         k++;
       }
 
-      if (k == ITTERATIONS)
+      if (k == ITERATIONS)
         framebuffer[i * RESX + j] = 0;
       else {
         long double smooth_colour =
           k + 1 - ((LOGPOINT5 + log(log(zx * zx + zy * zy))) / (LOG2));
         framebuffer[i * RESX + j] = colours[(
-          size_t)(smooth_colour / (long double)ITTERATIONS * COLOUR_DEPTH)];
+          size_t)(smooth_colour / (long double)ITERATIONS * COLOUR_DEPTH)];
       }
     }
 
@@ -140,7 +140,7 @@ int main() {
   framebuffer = calloc(sizeof(uint32_t), RESX * RESY);
 
   for (size_t i = 0; i < COLOUR_DEPTH; i++) {
-    long double k = (long double)(i * ITTERATIONS) / (long double)COLOUR_DEPTH;
+    long double k = (long double)(i * ITERATIONS) / (long double)COLOUR_DEPTH;
     long double n1 = sin(k * 0.1) * 0.5 + 0.5;
     long double n2 = cos(k * 0.1) * 0.5 + 0.5;
 
@@ -156,7 +156,7 @@ int main() {
   tinfo_t ts[THREADS] = {0};
 
   size_t roll = STARTING_POS;
-  long double curr_rotation = ((long double)STARTING_POS * ROTATE_AMMOUNT);
+  long double curr_rotation = ((long double)STARTING_POS * ROTATE_AMOUNT);
 
   while (1) {
     if (curr_rotation >= TAU)
@@ -178,7 +178,7 @@ int main() {
     snprintf(bufname, 1024, "pics/img%07zu.png", roll++);
     save_img(bufname);
 
-    curr_rotation += ROTATE_AMMOUNT;
+    curr_rotation += ROTATE_AMOUNT;
   }
 
   return 0;
