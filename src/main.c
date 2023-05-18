@@ -18,14 +18,18 @@
 #define MAX(X, Y) (((X) > (Y)) ? (X) : (Y))
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
-#define STARTING_POS 0
+/*#define MANDELBROT*/
+#define BURNING_SHIP
 
-#define MULTIPLIER 0.7885
+#define STARTING_POS 0
 
 #define THREADS 12
 
-#define ZOOM 5
+#define RADIUS 0.9
+#define ZOOM 6
 #define THRESHOLD 4
+#define CNST_X 0.3
+#define CNST_Y -0.3
 
 #define LOG2 0.69314718055994528622676398299518041312694549560546875
 #define LOGPOINT5 -0.69314718055994528622676398299518041312694549560546875
@@ -40,7 +44,7 @@
 
 #define COLOUR_DEPTH (size_t)30000
 
-#define ITERATIONS 2500
+#define ITERATIONS 100
 
 #define ROTATE_AMOUNT 0.01
 
@@ -87,8 +91,15 @@ static void *render(void *_inf) {
       size_t k = 0;
 
       while (k < ITERATIONS && zx * zx + zy * zy <= THRESHOLD) {
+#ifdef MANDELBROT
         long double nx = zx * zx - zy * zy + real;
         long double ny = 2 * zx * zy + imag;
+#endif
+     
+#ifdef BURNING_SHIP
+        long double nx = zx * zx - zy * zy + real;
+        long double ny = 2 * fabsl(zx * zy) + imag;
+#endif
 
         zx = nx;
         zy = ny;
@@ -148,7 +159,6 @@ int main() {
     uint8_t g = n2 * 0xff;
     uint8_t b = 1 * 0xff;
 
-    /*colours[i] = (0xff << 24) | (b << 16) | (g << 8) | (r << 0);*/
     colours[i] = (r << 16) | (g << 8) | (b << 0);
   }
 
@@ -156,16 +166,17 @@ int main() {
   tinfo_t ts[THREADS] = {0};
 
   size_t roll = STARTING_POS;
-  long double curr_rotation = ((long double)STARTING_POS * ROTATE_AMOUNT);
 
   while (1) {
-    if (curr_rotation >= TAU)
+    long double curr_rotation = roll * ROTATE_AMOUNT;
+    
+    if (curr_rotation > TAU)
       exit(0);
 
     for (size_t i = 0; i < THREADS; i++) {
       ts[i] = (tinfo_t){
-        .re = MULTIPLIER * cos(curr_rotation),
-        .im = MULTIPLIER * -sin(curr_rotation),
+        .re = RADIUS * cos(curr_rotation) + CNST_X,
+        .im = RADIUS * -sin(curr_rotation) + CNST_Y,
         .tid = i,
       };
 
@@ -177,8 +188,6 @@ int main() {
 
     snprintf(bufname, 1024, "pics/img%07zu.png", roll++);
     save_img(bufname);
-
-    curr_rotation += ROTATE_AMOUNT;
   }
 
   return 0;
